@@ -12,6 +12,14 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+# Display the result
+def mostrar_imagen(imagen, titulo='Imagen'):
+    plt.figure(figsize=(10, 5))
+    plt.imshow(imagen)
+    plt.title(titulo)
+    plt.axis('off')
+    plt.show()
+
 # Cargar imágenes
 img1 = cv2.imread('./images/1.jpg')
 img2 = cv2.imread('./images/2.jpg')
@@ -22,6 +30,12 @@ img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
 img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
 img4 = cv2.cvtColor(img4, cv2.COLOR_BGR2RGB)
+
+# Resize images to half their original size
+img1 = cv2.resize(img1, (0,0), fx=0.35, fy=0.35)
+img2 = cv2.resize(img2, (0,0), fx=0.35, fy=0.35)
+img3 = cv2.resize(img3, (0,0), fx=0.35, fy=0.35)
+img4 = cv2.resize(img4, (0,0), fx=0.35, fy=0.35)
 
 def mix2Images(img1, img2):
     # Inicializar el detector de puntos clave SIFT
@@ -53,8 +67,11 @@ def mix2Images(img1, img2):
     # Calcular dimensiones de salida y desplazamiento
     h1, w1, d1 = img1.shape
     h2, w2, d2 = img2.shape
-    panorama_width = int((w1 + w2) * 1.2)
-    panorama_height = int(max((h1, h2)) * 1.2)
+    # panorama_width = int((w1 + w2) * 1.4)
+    # panorama_height = int(max((h1, h2)) * 1.4)
+    
+    panorama_width = w1 + w2
+    panorama_height = max(h1, h2)
 
     # Warp the second image
     img2_transformed = cv2.warpPerspective(
@@ -95,19 +112,16 @@ def mix2Images(img1, img2):
         blended = img1 * mask + img2 * (1 - mask)
         return np.clip(blended, 0, 255).astype(np.uint8)
 
-    result = feather_blending(result, img2_transformed)
+    # mostrar_imagen(img2_transformed)
+    # mostrar_imagen(result)
+    # result = feather_blending(result, img2_transformed)
+    result = cv2.addWeighted(result, 0.5, img2_transformed, 0.8, 0)
     return result
 
 result = mix2Images(img3, img4)
 result = mix2Images(img2, result)
 result = mix2Images(img1, result)
 
-# Display the result
-def mostrar_imagen(imagen, titulo='Imagen'):
-    plt.figure(figsize=(10, 5))
-    plt.imshow(imagen)
-    plt.title(titulo)
-    plt.axis('off')
-    plt.show()
+
 
 mostrar_imagen(result, 'Imagen Panorámica Final')
