@@ -34,9 +34,9 @@ def blend_images(img1, img2, mask):
     blended_img = img1 * mask + img2 * (1 - mask)
     return blended_img.astype(np.uint8)
 
+sift = cv2.SIFT_create()
 def mix2Images(img1, img2):
     # Inicializar el detector de puntos clave SIFT
-    sift = cv2.SIFT_create()
 
     # Detectar puntos clave y descriptores
     keypoints_1, descriptors_1 = sift.detectAndCompute(img1, None)
@@ -76,9 +76,11 @@ def mix2Images(img1, img2):
     Ht = np.array([[1, 0, t[0]], [0, 1, t[1]], [0, 0, 1]])
 
     warped_img2 = cv2.warpPerspective(img2, Ht @ H, (xmax - xmin, ymax - ymin))
+    mostrar_imagen(warped_img2)
     
     img1_towarp = np.zeros((warped_img2.shape))
     img1_towarp[t[1]:h1 + t[1], t[0]:w1 + t[0]] = img1
+    mostrar_imagen(img1_towarp)
 
     # Create a black canvas
     return blend_images(img1_towarp, warped_img2, mask)
@@ -92,5 +94,75 @@ def stitch_images(image_list):
 
     return result
 
-result = stitch_images([img1, img2, img3])
+# Ejemplo 1
+img1 = cv2.imread('./images/IMG_0744.jpg')
+img2 = cv2.imread('./images/IMG_0745.jpg')
+
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+
+factor = 0.5
+image_list = [
+    cv2.resize(img1, (0,0), fx=factor, fy=factor),
+    cv2.resize(img2, (0,0), fx=factor, fy=factor),
+]
+
+result = stitch_images(image_list)
+mostrar_imagen(result, 'Imagen Panorámica Final')
+
+# Ejemplo 2
+img1 = cv2.imread('./images/P1/1.jpg')
+img2 = cv2.imread('./images/P1/2.jpg')
+img3 = cv2.imread('./images/P1/3.jpg')
+
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
+
+image_list = [
+    img2,
+    img3,
+    img1,
+]
+
+result = stitch_images(image_list)
+mostrar_imagen(result, 'Imagen Panorámica Final')
+
+# Ejemplo 3
+img1 = cv2.imread('./images/libr/1.jpg')
+img2 = cv2.imread('./images/libr/2.jpg')
+img3 = cv2.imread('./images/libr/3.jpg')
+
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
+
+image_list = [
+    img1,
+    img2,
+    img3,
+]
+
+result = stitch_images(image_list)
+mostrar_imagen(result, 'Imagen Panorámica Final')
+
+# Ejemplo 4
+img1 = cv2.imread('./images/fan/1.jpg')
+img2 = cv2.imread('./images/fan/2.jpg')
+img3 = cv2.imread('./images/fan/3.jpg')
+img4 = cv2.imread('./images/fan/4.jpg')
+
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
+img4 = cv2.cvtColor(img4, cv2.COLOR_BGR2RGB)
+
+image_list = [
+    img1,
+    img2,
+    # img3,
+    # img4,
+]
+
+result = stitch_images(image_list)
 mostrar_imagen(result, 'Imagen Panorámica Final')
